@@ -1,0 +1,22 @@
+{
+  "name": "restapie",
+  "version": "1.0.0",
+  "description": "A Node.js RESTful API Exercise project",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/Auzlex/Restapie.git"
+  },
+  "author": "Auzlex",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Auzlex/Restapie/issues"
+  },
+  "homepage": "https://github.com/Auzlex/Restapie#readme",
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}
