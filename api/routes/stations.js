@@ -90,9 +90,56 @@ router.post("/", (req, res, next) => {
 // update a station
 // Description: Update information about a specific monitoring station. This endpoint should be restricted to admin users only.
 router.patch("/:stationID", (req, res, next) => {
-    res.status(200).json({
-        message: "Updated station!"
-    });
+    const id = req.params.stationID;
+    const updateOps = {};
+
+    // Regular expression to allow only upper and lower case letters and numbers
+    const validNameRegex = /^[a-zA-Z0-9 ]+$/;
+
+    // Only allow updating the name field if it matches the regex
+    if (req.body.name && validNameRegex.test(req.body.name)) {
+        updateOps.name = req.body.name;
+    } else {
+        return res.status(400).json({
+            message: "Invalid name. Only upper and lower case letters and numbers are allowed."
+        });
+    }
+
+    // update the specific targeted station id
+    Station.updateOne({ _id: id }, { $set: updateOps })
+        .exec()
+        .then(result => {
+            if (result.matchedCount > 0) {
+                if (result.modifiedCount > 0) {
+                    res.status(200).json({
+                        message: "Station updated successfully",
+                        updatedStation: result,
+                        request: { // add a request object to each station
+                            type: "GET",
+                            url: "http://localhost:"+ (process.env.SERVER_PORT || 7000) +"/stations/" + id
+                        }
+                    });
+                } else {
+                    res.status(200).json({
+                        message: "Station found but no changes made",
+                        updatedStation: result,
+                        request: { // add a request object to each station
+                            type: "GET",
+                            url: "http://localhost:"+ (process.env.SERVER_PORT || 7000) +"/stations/" + id
+                        }
+                    });
+                }
+            } else {
+                res.status(404).json({
+                    message: "Station not found"
+                });
+            }
+        })
+        .catch(err => {
+            res.status(500).json({
+                error: err
+            });
+        });
 });
 
 // delete a station
