@@ -8,7 +8,6 @@ const mongoose = require("mongoose");
 
 // import products 
 const stationRoutes = require("./api/routes/stations"); // import the products routes
-//const ordersRoutes = require("./api/routes/orders"); // import the orders routes
 
 // check if the environment variable is set for MONGODB_PASSWORD
 if (!process.env.MONGODB_PASSWORD) {
@@ -37,7 +36,6 @@ app.use((req, res, next) => {
 
 // register the routes with the app
 app.use('/stations', stationRoutes); // use the productRoutes
-//app.use('/orders', ordersRoutes); // use the ordersRoutes
 
 // error handling for routes that do not exist
 app.use((req, res, next) => {
