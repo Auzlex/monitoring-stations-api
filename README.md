@@ -18,27 +18,27 @@ This project is a Node.js REST API for managing monitoring stations and their po
 ## Installation
 
 1. Clone the repository:
-   \`\`\`sh
+   ```sh
    git clone https://github.com/Auzlex/monitoring-stations-api
    cd monitoring-stations-api
-   \`\`\`
+   ```
 
 2. Install dependencies:
-   \`\`\`sh
+   ```sh
    npm install
-   \`\`\`
+    ```
 
 3. Set up environment variables:
-   Create a \`.env\` file in the root directory and add the following:
-   \`\`\`env
+   Create a `.env` file in the root directory and add the following:
+   ```env
     PORT=7000
     MONGODB_PASSWORD=password
-   \`\`\`
+   ```
 
 4. Start the server:
-   \`\`\`sh
+   ```sh
    npm start
-   \`\`\`
+   ```
 
 ## Usage
 
