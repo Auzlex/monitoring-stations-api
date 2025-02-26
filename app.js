@@ -3,7 +3,6 @@ require("dotenv").config(); // load environment variables
 const express = require("express");
 const app = express();
 const morgan = require("morgan");
-//const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 
 // import products 
