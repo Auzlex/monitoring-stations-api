@@ -255,7 +255,7 @@ router.post("/:stationID/records", (req, res, next) => {
                 updatedStation: result,
                 request: {
                     type: "GET",
-                    url: "http://localhost:" + (process.env.SERVER_PORT || 7000) + "/stations/" + id
+                    url: "http://localhost:" + (process.env.PORT || 7000) + "/stations/" + id
                 }
             });
         })
