@@ -1,3 +1,5 @@
+require("dotenv").config(); // load environment variables
+
 const express = require("express");
 const router = express.Router();
 
@@ -11,11 +13,32 @@ const Station = require("../models/station");
 */
 
 // handle get requests to /stations
-// Description: Retrieve a list of all monitoring stations with basic information (ID, name, location, coordinates, etc.). This endpoint should be publicly accessible.
+// Description: Retrieve a list of all monitoring stations with basic information (ID, name, location, coordinates). This endpoint should be publicly accessible.
 router.get("/", (req, res, next) => {
-    res.status(200).json({
-        message: "Handling GET requests to /stations"
-    });
+    Station.find() // find all stations
+        .select("_id name latitude longitude") // select only the id, name, latitude, and longitude
+        .exec()
+        .then(stations => {
+            const response = {
+                count: stations.length,
+                stations: stations.map(station => {
+                    return {
+                        _id: station._id,
+                        name: station.name,
+                        latitude: station.latitude,
+                        longitude: station.longitude,
+                        request: { // add a request object to each station
+                            type: "GET",
+                            url: "http://localhost:"+ (process.env.SERVER_PORT || 7000) +"/stations/" + station._id
+                        }
+                    };
+                })
+            };
+            res.status(200).json(response);
+        })
+        .catch(err => {
+            res.status(500).json({ error: err });
+        });
 });
 
 // get a specific station
