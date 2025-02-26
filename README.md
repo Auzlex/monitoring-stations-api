@@ -12,8 +12,8 @@ This project is a Node.js REST API for managing monitoring stations and their po
   - [Records](#records)
   - [Advanced Queries](#advanced-queries)
 - [Work in Progress](#work-in-progress)
-- [Contributing](#contributing)
-- [License](#license)
+<!-- - [Contributing](#contributing) -->
+<!-- - [License](#license) -->
 
 ## Installation
 
