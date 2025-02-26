@@ -94,6 +94,7 @@ The API provides endpoints to manage monitoring stations and their pollution rec
 
 ## Work in Progress
 
+- Implementing unit testing
 - Implementing the `GET /stations/records` endpoint to retrieve pollution records for all monitoring stations.
 - Implementing advanced query endpoints for retrieving stations within a certain radius and summarizing pollution records.
 
