@@ -177,9 +177,93 @@ router.delete("/:stationID", (req, res, next) => {
 // query parameters: from, to timestamps, limit, and pollutant type
 router.get("/:stationID/records", (req, res, next) => {
     const id = req.params.stationID;
-    res.status(200).json({
-        message: "Handling GET requests to /stations/" + id + "/records"
-    });
+    Station.findById(id)
+        .select("records") // select only the records field
+        .exec()
+        .then(station => {
+            if (station) {
+                res.status(200).json({ 
+                    
+                    message: "Found " + station.records.length + " records",
+                    records: station.records 
+
+                });
+            } else {
+                res.status(404).json({ message: "Station not found" });
+            }
+        })
+        .catch(err => {
+            res.status(500).json({ error: err });
+        });
+});
+
+// add a new record to a target station
+// Description: Add a new pollution record to a specific monitoring station. This endpoint should be restricted to admin users only.
+router.post("/:stationID/records", (req, res, next) => {
+    const id = req.params.stationID;
+
+    // Validate required fields
+    if (!req.body.ts || !req.body.nox || !req.body.no2 || !req.body.no) {
+        return res.status(400).json({
+            message: "Missing required fields: ts, nox, no2, and no are required."
+        });
+    }
+
+    // Validate that required fields are numbers
+    if (isNaN(req.body.ts) || isNaN(req.body.nox) || isNaN(req.body.no2) || isNaN(req.body.no)) {
+        return res.status(400).json({
+            message: "Invalid input: ts, nox, no2, and no must be numbers."
+        });
+    }
+
+    // Validate optional fields if they are provided
+    const optionalFields = ['pm10', 'co', 'o3', 'so2'];
+    for (const field of optionalFields) {
+        if (req.body[field] !== undefined && isNaN(req.body[field])) {
+            return res.status(400).json({
+                message: `Invalid input: ${field} must be a number if provided.`
+            });
+        }
+    }
+
+    // Create the new record object
+    const newRecord = {
+        ts: req.body.ts,
+        nox: req.body.nox,
+        no2: req.body.no2,
+        no: req.body.no,
+        pm10: req.body.pm10 || null,
+        co: req.body.co || null,
+        o3: req.body.o3 || null,
+        so2: req.body.so2 || null
+    };
+
+    // Find the station by ID and add the new record
+    Station.findById(id)
+        .exec()
+        .then(station => {
+            if (station) {
+                station.records.push(newRecord);
+                return station.save();
+            } else {
+                res.status(404).json({ message: "Station not found" });
+            }
+        })
+        .then(result => {
+            res.status(201).json({
+                message: "Record added successfully",
+                updatedStation: result,
+                request: {
+                    type: "GET",
+                    url: "http://localhost:" + (process.env.SERVER_PORT || 7000) + "/stations/" + id
+                }
+            });
+        })
+        .catch(err => {
+            res.status(500).json({
+                error: err
+            });
+        });
 });
 
 // get all records across all stations
