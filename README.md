@@ -31,6 +31,7 @@ This project is a Node.js REST API for managing monitoring stations and their po
 
 3. Set up environment variables:
    Create a `.env` file in the root directory and add the following:
+   
    **NOTE**: I have implemented an env variable pre-processor to process variable references in the .env
    ```env
     PORT=7000
