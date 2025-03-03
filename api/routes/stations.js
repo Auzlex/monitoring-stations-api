@@ -62,8 +62,21 @@ router.get("/:stationID", (req, res, next) => {
 // handle post requests to /stations
 // Description: Add a new monitoring station to the database. This endpoint should be restricted to admin users only.
 router.post("/", (req, res, next) => {
+    // Validate required fields
+    if (!req.body.name || !req.body.latitude || !req.body.longitude) {
+        return res.status(400).json({
+            message: "Station validation failed: name, latitude, and longitude are required."
+        });
+    }
 
-    // create a new instance of the station model
+    // Validate that latitude and longitude are numbers
+    if (isNaN(req.body.latitude) || isNaN(req.body.longitude)) {
+        return res.status(400).json({
+            message: "Station validation failed: latitude and longitude must be numbers."
+        });
+    }
+
+    // Create a new instance of the station model
     const station = new Station({
         _id: new mongoose.Types.ObjectId(),
         name: req.body.name,
@@ -72,7 +85,7 @@ router.post("/", (req, res, next) => {
         records: [] // initialize records as an empty array
     });
 
-    // save the station to the database
+    // Save the station to the database
     station.save()
         .then(result => {
             res.status(201).json({
