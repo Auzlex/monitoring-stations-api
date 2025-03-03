@@ -1,4 +1,5 @@
-require("dotenv").config(); // load environment variables
+const loadEnv = require('../../loadEnv');
+loadEnv(); // Load and process environment variables
 
 const express = require("express");
 const router = express.Router();

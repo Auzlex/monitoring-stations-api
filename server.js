@@ -1,4 +1,5 @@
-require("dotenv").config(); // load environment variables
+const loadEnv = require('./loadEnv');
+loadEnv(); // Load and process environment variables
 
 // require the http module
 const http = require('http');

@@ -1,4 +1,5 @@
-require("dotenv").config(); // load environment variables
+const loadEnv = require('../loadEnv');
+loadEnv(); // Load and process environment variables
 
 const request = require('supertest');
 const server = require('../server'); // Adjust the path as necessary
@@ -8,7 +9,7 @@ const Station = require('../api/models/station');
 describe('Stations', () => {
     // Before all tests, connect to the test database
     beforeAll(async () => {
-        await mongoose.connect("mongodb+srv://auzlex:" + process.env.MONGODB_PASSWORD +  "@pollution-cluster0.i6ixz.mongodb.net/?retryWrites=true&w=majority&appName=pollution-cluster0", { useNewUrlParser: true, useUnifiedTopology: true });
+        await mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true });
         console.log('Connected to the test database');
     });
 
@@ -34,7 +35,6 @@ describe('Stations', () => {
         });
     });
 
-    // Test the POST /stations route
     // Test the POST /stations route
     describe('POST /stations', () => {
         it('should not POST a station without name field', async () => {
