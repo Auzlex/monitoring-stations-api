@@ -124,30 +124,29 @@ Unit tests have been implemented to ensure the input and output of the endpoints
 #### Example output
 
 ```sh
-GET /stations 200 44.661 ms - 25
-POST /stations 400 11.559 ms - 84
-POST /stations 400 1.232 ms - 84
-POST /stations 400 1.125 ms - 84
-POST /stations 400 1.124 ms - 80
-POST /stations 400 1.044 ms - 80
-POST /stations 201 39.389 ms - 176
+GET /stations 200 57.242 ms - 25
+GET /stations 200 31.010 ms - 215
+GET /stations/67c8232df5f7418c81c31000 200 30.624 ms - 122
+GET /stations/67c8232df5f7418c81c31005 404 28.712 ms - 31
+POST /stations 400 15.079 ms - 84
+POST /stations 400 1.086 ms - 84
+POST /stations 400 1.264 ms - 84
+POST /stations 400 1.133 ms - 80
+POST /stations 400 1.546 ms - 80
+POST /stations 201 39.015 ms - 176
  PASS  test/station.test.js
   Stations
     GET /stations
-      √ should GET all the stations (563 ms)
+      √ should GET all the stations (660 ms)
+      √ should GET a station by the given id (155 ms)
+      √ should return 404 for a non-existent station id (64 ms)
     POST /stations
-      √ should not POST a station without name field (49 ms)
-      √ should not POST a station without latitude field (32 ms)
-      √ should not POST a station without longitude field (27 ms)
-      √ should not POST a station with non-numeric latitude (28 ms)
-      √ should not POST a station with non-numeric longitude (28 ms)
-      √ should POST a station (71 ms)
-
-Test Suites: 1 passed, 1 total
-Tests:       7 passed, 7 total
-Snapshots:   0 total
-Time:        2.051 s, estimated 3 s
-Ran all test suites.
+      √ should not POST a station without name field (52 ms)
+      √ should not POST a station without latitude field (37 ms)
+      √ should not POST a station without longitude field (36 ms)
+      √ should not POST a station with non-numeric latitude (35 ms)
+      √ should not POST a station with non-numeric longitude (36 ms)
+      √ should POST a station (73 ms)
 ```
 
 ### Running the Tests
