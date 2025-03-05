@@ -2,6 +2,7 @@
 # Node.js REST API for Monitoring Stations
 
 This project is a Node.js REST API for managing monitoring stations and their pollution records. The API allows users to perform CRUD operations on monitoring stations and their records. This is a work in progress, and some features are still under development and is a Node.js development exercise to improve my understanding and skills.
+This REST API will communicate to MongoDB Atlas to a target cluster.
 
 ## Table of Contents
 
