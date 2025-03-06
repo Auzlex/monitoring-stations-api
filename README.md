@@ -124,29 +124,40 @@ Unit tests have been implemented to ensure the input and output of the endpoints
 #### Example output
 
 ```sh
-GET /stations 200 57.242 ms - 25
-GET /stations 200 31.010 ms - 215
-GET /stations/67c8232df5f7418c81c31000 200 30.624 ms - 122
-GET /stations/67c8232df5f7418c81c31005 404 28.712 ms - 31
-POST /stations 400 15.079 ms - 84
-POST /stations 400 1.086 ms - 84
-POST /stations 400 1.264 ms - 84
-POST /stations 400 1.133 ms - 80
-POST /stations 400 1.546 ms - 80
-POST /stations 201 39.015 ms - 176
- PASS  test/station.test.js
+GET /stations 200 46.541 ms - 25
+GET /stations 200 28.722 ms - 215
+GET /stations/67c9899e19bc37c9530d7070 200 26.927 ms - 122
+GET /stations/67c9899e19bc37c9530d7075 404 25.379 ms - 31
+POST /stations 400 11.872 ms - 84
+POST /stations 400 1.075 ms - 84
+POST /stations 400 1.023 ms - 84
+POST /stations 400 1.031 ms - 80
+POST /stations 400 1.138 ms - 80
+POST /stations 201 34.743 ms - 176
+PATCH /stations/67c9899f19bc37c9530d7080 200 35.805 ms - 241
+PATCH /stations/67c9899f19bc37c9530d708b 404 25.870 ms - 31
   Stations
     GET /stations
-      √ should GET all the stations (660 ms)
-      √ should GET a station by the given id (155 ms)
-      √ should return 404 for a non-existent station id (64 ms)
+      √ should GET all the stations (608 ms)
+      √ should GET a station by the given id (138 ms)
+      √ should return 404 for a non-existent station id (65 ms)
     POST /stations
-      √ should not POST a station without name field (52 ms)
-      √ should not POST a station without latitude field (37 ms)
-      √ should not POST a station without longitude field (36 ms)
-      √ should not POST a station with non-numeric latitude (35 ms)
+      √ should not POST a station without name field (44 ms)
+      √ should not POST a station without latitude field (31 ms)
+      √ should not POST a station without longitude field (34 ms)
+      √ should not POST a station with non-numeric latitude (31 ms)
       √ should not POST a station with non-numeric longitude (36 ms)
       √ should POST a station (73 ms)
+    PATCH /stations/:stationID
+      √ should PATCH a station name successfully (130 ms)
+      √ should not PATCH a station with invalid name format (95 ms)
+      √ should return 404 when PATCHing a non-existent station (89 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       12 passed, 12 total
+Snapshots:   0 total
+Time:        2.655 s, estimated 17 s
+Ran all test suites.
 ```
 
 ### Running the Tests
