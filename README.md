@@ -119,6 +119,24 @@ The API provides endpoints to manage monitoring stations and their pollution rec
     - Validates all input parameters
     - Returns appropriate error messages for invalid inputs
 
+  - Example Usage:
+    ```sh
+    # Get all records
+    GET /records
+
+    # Get records within a timestamp range
+    GET /records?from=2000&to=4000
+
+    # Get records for a specific pollutant
+    GET /records?pollutant=o3
+
+    # Get latest 5 records
+    GET /records?limit=5
+
+    # Combine multiple filters
+    GET /records?from=2000&to=4000&pollutant=no2&limit=3
+    ```
+
 ### Advanced Queries
 
 - **GET /stations/nearest?lat={lat}&lng={lng}&radius={km}**
