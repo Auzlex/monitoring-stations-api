@@ -197,10 +197,8 @@ router.get("/:stationID/records", (req, res, next) => {
         .then(station => {
             if (station) {
                 res.status(200).json({ 
-                    
                     message: "Found " + station.records.length + " records",
                     records: station.records 
-
                 });
             } else {
                 res.status(404).json({ message: "Station not found" });
@@ -278,15 +276,6 @@ router.post("/:stationID/records", (req, res, next) => {
                 error: err
             });
         });
-});
-
-// get all records across all stations
-// Description: Retrieve pollution records for all monitoring stations. This endpoint should be publicly accessible.
-// query parameters: from, to timestamps, limit, and pollutant type
-router.get("/records", (req, res, next) => {
-    res.status(200).json({
-        message: "Handling GET requests to /stations/records"
-    });
 });
 
 /* 

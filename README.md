@@ -82,9 +82,42 @@ The API provides endpoints to manage monitoring stations and their pollution rec
   - Description: Add a new pollution record to a specific monitoring station. This endpoint should be restricted to admin users only.
   - Status: Implemented
 
-- **GET /stations/records**
+- **GET /records**
   - Description: Retrieve pollution records for all monitoring stations. This endpoint should be publicly accessible.
-  - Status: Not Implemented
+  - Status: Implemented
+  - Query Parameters:
+    - `from`: Filter records from this timestamp (optional)
+    - `to`: Filter records until this timestamp (optional)
+    - `limit`: Limit the number of records returned (optional)
+    - `pollutant`: Filter records by pollutant type (optional)
+  - Response Format:
+    ```json
+    {
+      "count": number,
+      "records": [
+        {
+          "stationName": string,
+          "ts": number,
+          "nox": number,
+          "no2": number,
+          "no": number,
+          "pm10": number,
+          "co": number,
+          "o3": number,
+          "so2": number
+        }
+      ]
+    }
+    ```
+  - Features:
+    - Returns records from all stations combined
+    - Records are sorted by timestamp (newest first)
+    - Each record includes the station name
+    - Supports filtering by timestamp range
+    - Supports filtering by pollutant type
+    - Supports limiting the number of records
+    - Validates all input parameters
+    - Returns appropriate error messages for invalid inputs
 
 ### Advanced Queries
 
@@ -130,6 +163,41 @@ Unit tests have been implemented to ensure the input and output of the endpoints
     - The database state is correctly updated.
     - Error messages are appropriate for each failure case.
 
+- **DELETE /stations/:stationID**
+  - Tests deleting a station, including validation and error handling.
+  - Ensures the response status is 200 for successful deletion and 404 for non-existent stations.
+  - Test scenarios:
+    - Successfully deleting a specific station while preserving other stations in the database.
+    - Attempting to delete a non-existent station.
+  - Validates that:
+    - Only the target station is removed from the database.
+    - Other stations remain untouched and maintain their original data.
+    - The response message is appropriate.
+    - Non-existent stations return appropriate error messages.
+    - Database integrity is maintained during deletion operations.
+
+#### Records
+
+- **GET /stations/records**
+  - Tests retrieving pollution records from all monitoring stations.
+  - Ensures the response status is 200 for successful requests and 400 for invalid parameters.
+  - Test scenarios:
+    - Retrieving all records from all stations.
+    - Filtering records by timestamp range.
+    - Filtering records by pollutant type.
+    - Limiting the number of records returned.
+    - Handling invalid timestamp formats.
+    - Handling invalid timestamp ranges.
+    - Handling invalid limit values.
+    - Handling invalid pollutant types.
+  - Validates that:
+    - Records are properly combined from all stations.
+    - Each record includes the station name.
+    - Filters are correctly applied.
+    - Records are sorted by timestamp (newest first).
+    - Error messages are appropriate for each validation case.
+    - Response format matches the expected structure.
+
 #### Example output
 
 ```sh
@@ -161,6 +229,9 @@ PATCH /stations/67c9899f19bc37c9530d708b 404 25.870 ms - 31
       √ should PATCH a station name successfully (130 ms)
       √ should not PATCH a station with invalid name format (95 ms)
       √ should return 404 when PATCHing a non-existent station (89 ms)
+    DELETE /stations/:stationID
+      √ should DELETE a station successfully (130 ms)
+      √ should return 404 when deleting a non-existent station (65 ms)
 
 Test Suites: 1 passed, 1 total
 Tests:       12 passed, 12 total
