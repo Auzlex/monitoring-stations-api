@@ -1,4 +1,3 @@
-
 # Node.js REST API for Monitoring Stations
 
 This project is a Node.js REST API for managing monitoring stations and their pollution records. The API allows users to perform CRUD operations on monitoring stations and their records. This is a work in progress, and some features are still under development and is a Node.js development exercise to improve my understanding and skills.
@@ -119,7 +118,17 @@ Unit tests have been implemented to ensure the input and output of the endpoints
     - Non-numeric `latitude`.
     - Non-numeric `longitude`.
 
-- more to be implemented
+- **PATCH /stations/:stationID**
+  - Tests updating a station's name, including validation and error handling.
+  - Ensures the response status is 200 for successful updates and appropriate error codes for failures.
+  - Test scenarios:
+    - Successfully updating a station's name.
+    - Attempting to update with invalid name format (special characters).
+    - Attempting to update a non-existent station.
+  - Validates that:
+    - The station ID remains unchanged after update.
+    - The database state is correctly updated.
+    - Error messages are appropriate for each failure case.
 
 #### Example output
 
