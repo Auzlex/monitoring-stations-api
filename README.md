@@ -178,65 +178,80 @@ Unit tests have been implemented to ensure the input and output of the endpoints
 
 #### Records
 
-- **GET /stations/records**
+- **GET /records**
   - Tests retrieving pollution records from all monitoring stations.
   - Ensures the response status is 200 for successful requests and 400 for invalid parameters.
   - Test scenarios:
-    - Retrieving all records from all stations.
-    - Filtering records by timestamp range.
-    - Filtering records by pollutant type.
-    - Limiting the number of records returned.
-    - Handling invalid timestamp formats.
-    - Handling invalid timestamp ranges.
-    - Handling invalid limit values.
-    - Handling invalid pollutant types.
+    - Retrieving all records from all stations
+      - Verifies correct count of records
+      - Validates all required fields are present
+      - Confirms records are sorted by timestamp (newest first)
+    - Filtering records by timestamp range
+      - Tests filtering with valid from/to timestamps
+      - Verifies records are within the specified range
+      - Confirms sorting is maintained
+    - Filtering records by pollutant type
+      - Tests filtering with valid pollutant types
+      - Verifies all returned records contain the specified pollutant
+    - Limiting the number of records returned
+      - Tests limit parameter with valid values
+      - Verifies correct number of records are returned
+      - Confirms most recent records are returned first
+    - Combining multiple filters
+      - Tests simultaneous use of timestamp range, pollutant type, and limit
+      - Verifies all filters are applied correctly
+    - Input validation
+      - Tests invalid timestamp format
+      - Tests invalid timestamp range (from > to)
+      - Tests invalid limit values (negative numbers)
+      - Tests invalid pollutant types
+    - Handling edge cases
+      - Tests behavior with stations containing no records
+      - Verifies correct handling of empty result sets
   - Validates that:
-    - Records are properly combined from all stations.
-    - Each record includes the station name.
-    - Filters are correctly applied.
-    - Records are sorted by timestamp (newest first).
-    - Error messages are appropriate for each validation case.
-    - Response format matches the expected structure.
+    - Records are properly combined from all stations
+    - Each record includes the station name
+    - All required pollutant fields are present
+    - Filters are correctly applied
+    - Records are sorted by timestamp (newest first)
+    - Error messages are appropriate for each validation case
+    - Response format matches the expected structure
+    - Count field accurately reflects the number of records
 
 #### Example output
 
 ```sh
-GET /stations 200 46.541 ms - 25
-GET /stations 200 28.722 ms - 215
-GET /stations/67c9899e19bc37c9530d7070 200 26.927 ms - 122
-GET /stations/67c9899e19bc37c9530d7075 404 25.379 ms - 31
-POST /stations 400 11.872 ms - 84
-POST /stations 400 1.075 ms - 84
-POST /stations 400 1.023 ms - 84
-POST /stations 400 1.031 ms - 80
-POST /stations 400 1.138 ms - 80
-POST /stations 201 34.743 ms - 176
-PATCH /stations/67c9899f19bc37c9530d7080 200 35.805 ms - 241
-PATCH /stations/67c9899f19bc37c9530d708b 404 25.870 ms - 31
+ PASS  test/station.test.js
   Stations
     GET /stations
-      √ should GET all the stations (608 ms)
-      √ should GET a station by the given id (138 ms)
-      √ should return 404 for a non-existent station id (65 ms)
-    POST /stations
-      √ should not POST a station without name field (44 ms)
-      √ should not POST a station without latitude field (31 ms)
+      √ should GET all the stations (552 ms)
+      √ should GET a station by the given id (134 ms)
+      √ should not POST a station without name field (43 ms)
+      √ should not POST a station without latitude field (33 ms)
       √ should not POST a station without longitude field (34 ms)
-      √ should not POST a station with non-numeric latitude (31 ms)
-      √ should not POST a station with non-numeric longitude (36 ms)
-      √ should POST a station (73 ms)
+      √ should POST a station (65 ms)
     PATCH /stations/:stationID
-      √ should PATCH a station name successfully (130 ms)
-      √ should not PATCH a station with invalid name format (95 ms)
-      √ should return 404 when PATCHing a non-existent station (89 ms)
+      √ should not PATCH a station with invalid name format (94 ms)
+      √ should return 404 when PATCHing a non-existent station (96 ms)
     DELETE /stations/:stationID
-      √ should DELETE a station successfully (130 ms)
-      √ should return 404 when deleting a non-existent station (65 ms)
+      √ should DELETE only the target station (184 ms)
+      √ should return 404 when deleting a non-existent station (181 ms)
+    GET /records
+      √ should GET all records from all stations (155 ms)
+      √ should filter records by timestamp range (152 ms)
+      √ should filter records by pollutant type (152 ms)
+      √ should limit the number of records returned (161 ms)
+      √ should combine multiple filters (154 ms)
+      √ should return 400 for invalid timestamp format (118 ms)
+      √ should return 400 for invalid timestamp range (120 ms)
+      √ should return 400 for invalid limit (123 ms)
+      √ should return 400 for invalid pollutant type (119 ms)
+      √ should handle empty records (193 ms)
 
 Test Suites: 1 passed, 1 total
-Tests:       12 passed, 12 total
+Tests:       24 passed, 24 total
 Snapshots:   0 total
-Time:        2.655 s, estimated 17 s
+Time:        4.367 s, estimated 5 s
 Ran all test suites.
 ```
 
