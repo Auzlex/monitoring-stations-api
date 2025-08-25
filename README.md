@@ -316,11 +316,13 @@ To run the tests, use the following command:
 npm test
 ```
 
-## Work in Progress
+## Work in Progress / Next Steps
 
-- Implementing unit testing
+- Implementing more unit tests
 - Implementing the `GET /stations/records` endpoint to retrieve pollution records for all monitoring stations.
 - Implementing advanced query endpoints for retrieving stations within a certain radius and summarizing pollution records.
+- Need to implement a CI/CD pipeline for this with docker, so that I can deploy future projects easily on my website.
+- Front End UI that uses this API
 
 <!-- ## Contributing
 
