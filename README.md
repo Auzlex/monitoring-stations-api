@@ -36,6 +36,8 @@ This REST API will communicate to MongoDB Atlas to a target cluster.
    ```env
     PORT=7000
     MONGODB_PASSWORD=<password>
+    ENDPOINT_ADMIN_ACCESS_PASSWORD=admin
+    JWT_SECRET=SECRET
     MONGODB_URI=mongodb+srv://<username>:${MONGODB_PASSWORD}@<cluster>
    ```
 
