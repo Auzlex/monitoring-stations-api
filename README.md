@@ -139,6 +139,40 @@ The API provides endpoints to manage monitoring stations and their pollution rec
     GET /records?from=2000&to=4000&pollutant=no2&limit=3
     ```
 
+### User
+
+  - **POST /user/login**
+  - Description: Log in with email and password. Returns a JWT token if the credentials are valid.
+  - Request Body:
+    ```json
+    {
+      "email": "user@example.com",
+      "password": "admin"
+    }
+    ```
+  - Responses:
+    - **200 OK**: 
+      ```json
+      {
+        "token": "<JWT_TOKEN>"
+      }
+      ```
+    - **401 Unauthorized**: 
+      ```json
+      {
+        "message": "Invalid credentials"
+      }
+      ```
+    - **500 Internal Server Error**: 
+      ```json
+      {
+        "error": "Error message"
+      }
+      ```
+  - Notes: 
+    - Admin role is assigned if the email is `admin@example.com`. Simple password auth to grab a token for restricted endpoints if password is known.
+    - JWT token expires in 1 hour.
+
 ### Advanced Queries
 
 - **GET /stations/nearest?lat={lat}&lng={lng}&radius={km}**
