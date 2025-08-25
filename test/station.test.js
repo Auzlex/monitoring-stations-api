@@ -6,10 +6,19 @@ const server = require('../server'); // Adjust the path as necessary
 const mongoose = require('mongoose');
 const Station = require('../api/models/station');
 
+const jwt = require("jsonwebtoken");
+
+jest.mock("../api/middleware/check-auth", () => {
+    return (req, res, next) => {
+        req.userData = { id: "testUser", role: "admin" };
+        next();
+    };
+});
+
 describe('Stations', () => {
     // Before all tests, connect to the test database
     beforeAll(async () => {
-        await mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true });
+        await mongoose.connect(process.env.MONGODB_URI);
         console.log('Connected to the test database');
     });
 
@@ -82,6 +91,15 @@ describe('Stations', () => {
 
     // Test the POST /stations route
     describe('POST /stations', () => {
+
+        beforeAll(() => {
+            token = jwt.sign(
+                { id: "testUser", role: "admin" },
+                process.env.JWT_SECRET,
+                { expiresIn: "1h" }
+            );
+        });
+
         it('should not POST a station without name field', async () => {
             // ARRANGE
             const station = {
@@ -172,6 +190,15 @@ describe('Stations', () => {
 
     // Test the PATCH /stations/:stationID route
     describe('PATCH /stations/:stationID', () => {
+
+        beforeAll(() => {
+            token = jwt.sign(
+                { id: "testUser", role: "admin" },
+                process.env.JWT_SECRET,
+                { expiresIn: "1h" }
+            );
+        });
+
         let testStation;
 
         beforeEach(async () => {
@@ -246,6 +273,15 @@ describe('Stations', () => {
 
     // Test the DELETE /stations/:stationID route
     describe('DELETE /stations/:stationID', () => {
+
+        beforeAll(() => {
+            token = jwt.sign(
+                { id: "testUser", role: "admin" },
+                process.env.JWT_SECRET,
+                { expiresIn: "1h" }
+            );
+        });
+
         let testStation1;
         let testStation2;
 

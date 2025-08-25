@@ -6,9 +6,12 @@ const router = express.Router();
 const mongoose = require("mongoose");
 const Station = require("../models/station");
 
+//const checkAuth = require("../middleware/check-auth");
+
 // get all records across all stations
-// Description: Retrieve pollution records for all monitoring stations. This endpoint should be publicly accessible.
+// Description: Retrieve pollution records for all monitoring stations. 
 // query parameters: from, to timestamps, limit, and pollutant type
+// [PUBLIC] This endpoint should be publicly accessible.
 router.get("/", (req, res, next) => {
     // ARRANGE
     const from = req.query.from ? parseInt(req.query.from) : null;

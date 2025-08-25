@@ -7,6 +7,8 @@ const router = express.Router();
 const mongoose = require("mongoose");
 const Station = require("../models/station");
 
+const checkAuth = require("../middleware/check-auth");
+
 /* 
 
     Station Metadata
@@ -14,7 +16,8 @@ const Station = require("../models/station");
 */
 
 // handle get requests to /stations
-// Description: Retrieve a list of all monitoring stations with basic information (ID, name, location, coordinates). This endpoint should be publicly accessible.
+// Description: Retrieve a list of all monitoring stations with basic information (ID, name, location, coordinates). 
+// [PUBLIC] This endpoint should be publicly accessible.
 router.get("/", (req, res, next) => {
     Station.find() // find all stations
         .select("_id name latitude longitude") // select only the id, name, latitude, and longitude
@@ -43,7 +46,8 @@ router.get("/", (req, res, next) => {
 });
 
 // get a specific station
-// Description: Retrieve detailed information about a specific monitoring station. This endpoint should be publicly accessible.
+// Description: Retrieve detailed information about a specific monitoring station. 
+// [PUBLIC] This endpoint should be publicly accessible.
 router.get("/:stationID", (req, res, next) => {
     const id = req.params.stationID;
     Station.findById(id)
@@ -61,8 +65,9 @@ router.get("/:stationID", (req, res, next) => {
 });
 
 // handle post requests to /stations
-// Description: Add a new monitoring station to the database. This endpoint should be restricted to admin users only.
-router.post("/", (req, res, next) => {
+// Description: Add a new monitoring station to the database. 
+// [RESTRICTED] This endpoint should be restricted to admin users only.
+router.post("/", checkAuth, (req, res, next) => {
     // Validate required fields
     if (!req.body.name || !req.body.latitude || !req.body.longitude) {
         return res.status(400).json({
@@ -102,8 +107,9 @@ router.post("/", (req, res, next) => {
 });
 
 // update a station
-// Description: Update information about a specific monitoring station. This endpoint should be restricted to admin users only.
-router.patch("/:stationID", (req, res, next) => {
+// Description: Update information about a specific monitoring station. 
+// [RESTRICTED] This endpoint should be restricted to admin users only.
+router.patch("/:stationID", checkAuth, (req, res, next) => {
     const id = req.params.stationID;
     const updateOps = {};
 
@@ -157,8 +163,9 @@ router.patch("/:stationID", (req, res, next) => {
 });
 
 // delete a station
-// Description: Delete a specific monitoring station from the database. This endpoint should be restricted to admin users only.
-router.delete("/:stationID", (req, res, next) => {
+// Description: Delete a specific monitoring station from the database. 
+// [RESTRICTED] This endpoint should be restricted to admin users only.
+router.delete("/:stationID", checkAuth, (req, res, next) => {
     const id = req.params.stationID;
     Station.findByIdAndDelete(id)
         .exec()
@@ -187,8 +194,9 @@ router.delete("/:stationID", (req, res, next) => {
 */
 
 // get a target station's pollution records
-// Description: Retrieve pollution records for a specific monitoring station. This endpoint should be publicly accessible.
+// Description: Retrieve pollution records for a specific monitoring station. 
 // query parameters: from, to timestamps, limit, and pollutant type
+// [PUBLIC] This endpoint should be publicly accessible.
 router.get("/:stationID/records", (req, res, next) => {
     const id = req.params.stationID;
     Station.findById(id)
@@ -210,8 +218,9 @@ router.get("/:stationID/records", (req, res, next) => {
 });
 
 // add a new record to a target station
-// Description: Add a new pollution record to a specific monitoring station. This endpoint should be restricted to admin users only.
-router.post("/:stationID/records", (req, res, next) => {
+// Description: Add a new pollution record to a specific monitoring station. 
+// [RESTRICTED] This endpoint should be restricted to admin users only.
+router.post("/:stationID/records", checkAuth, (req, res, next) => {
     const id = req.params.stationID;
 
     // Validate required fields
@@ -285,7 +294,8 @@ router.post("/:stationID/records", (req, res, next) => {
 */
 
 // GET /stations/nearest?lat={lat}&lng={lng}&radius={km}
-// Description: Retrieve a list of monitoring stations within a certain radius of a given location. This endpoint should be publicly accessible.
+// Description: Retrieve a list of monitoring stations within a certain radius of a given location. 
+// [PUBLIC] This endpoint should be publicly accessible.
 router.get("/nearest", (req, res, next) => {
     const lat = req.query.lat;
     const lng = req.query.lng;
@@ -299,7 +309,8 @@ router.get("/nearest", (req, res, next) => {
 });
 
 // GET /stations/:id/summary
-// Description: Retrieve a summary of pollution records for a specific monitoring station. This endpoint should be publicly accessible.
+// Description: Retrieve a summary of pollution records for a specific monitoring station. 
+// [PUBLIC] This endpoint should be publicly accessible.
 router.get("/:stationID/summary", (req, res, next) => {
     const id = req.params.stationID;
     res.status(200).json({

@@ -9,6 +9,7 @@ const mongoose = require("mongoose");
 // import routes
 const stationRoutes = require("./api/routes/stations");
 const recordRoutes = require("./api/routes/records");
+const userRoutes = require("./api/routes/user")
 
 // check if the environment variable is set for MONGODB_PASSWORD
 if (!process.env.MONGODB_URI) {
@@ -17,7 +18,7 @@ if (!process.env.MONGODB_URI) {
 }
 
 // attempt to connect to the database
-mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true }); // connect to the database
+mongoose.connect(process.env.MONGODB_URI); // connect to the database
 
 // load middleware
 app.use(morgan("dev")); // log requests
@@ -38,6 +39,7 @@ app.use((req, res, next) => {
 // register the routes with the app
 app.use('/stations', stationRoutes);
 app.use('/records', recordRoutes);
+app.use('/user', userRoutes);
 
 // error handling for routes that do not exist
 app.use((req, res, next) => {
