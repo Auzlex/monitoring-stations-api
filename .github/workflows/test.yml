@@ -3,43 +3,42 @@ name: CI - Test and Auto Merge
 on:
   push:
     branches: [dev]
-  pull_request:
+  pull_request_target:          # ← changed
     branches: [dev]
 
-# Required so the auto-merge job can push to main
 permissions:
   contents: write
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    # ← This environment must exist in repo settings and require reviewer approval
+    environment: test-with-secrets
 
-    # ← All env vars are defined once at job level → available to every step
     env:
       SKIP_ENV_FILE: true
       PORT: ${{ secrets.PORT }}
-      MONGODB_PASSWORD: ${{ secrets.MONGODB_PASSWORD }}
-      ENDPOINT_ADMIN_ACCESS_PASSWORD: ${{ secrets.ENDPOINT_ADMIN_ACCESS_PASSWORD }}
-      MONGODB_URI: ${{ secrets.MONGODB_URI }}
-      JWT_SECRET: ${{ secrets.JWT_SECRET }}
+      # ... all your other secrets
 
     steps:
-      - name: Checkout repository
+      - name: Checkout PR code (safely)
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}   # this is the PR's commit
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      - name: Debug env (check this in the logs!)
+      - name: Debug env
         run: env
 
       - name: Install dependencies
         run: npm ci
 
       - name: Run Jest tests
-        run: npm test   # ← no need to repeat env here
+        run: npm test
 
   auto-merge:
     needs: test
