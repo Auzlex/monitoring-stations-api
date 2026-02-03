@@ -22,7 +22,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run Jest tests
+      - name: Debug env run env
         env:
           SKIP_ENV_FILE: true
           PORT: ${{ secrets.PORT }}
@@ -30,6 +30,8 @@ jobs:
           ENDPOINT_ADMIN_ACCESS_PASSWORD: ${{ secrets.ENDPOINT_ADMIN_ACCESS_PASSWORD }}
           MONGODB_URI: ${{ secrets.MONGODB_URI }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
+        run: env
+      - name: Run Jest tests
         run: npm test
 
   auto-merge:
