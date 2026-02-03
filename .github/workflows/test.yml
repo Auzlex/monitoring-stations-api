@@ -2,14 +2,19 @@ name: CI - Test and Auto Merge
 
 on:
   push:
-    branches: [ dev ]
+    branches: [dev]
   pull_request:
-    branches: [ dev ]
+    branches: [dev]
+
+# Required so the auto-merge job can push to main
+permissions:
+  contents: write
 
 jobs:
   test:
     runs-on: ubuntu-latest
-    
+
+    # ← All env vars are defined once at job level → available to every step
     env:
       SKIP_ENV_FILE: true
       PORT: ${{ secrets.PORT }}
@@ -26,27 +31,21 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-      
-      - name: Debug env
+
+      - name: Debug env (check this in the logs!)
         run: env
 
       - name: Install dependencies
         run: npm ci
 
       - name: Run Jest tests
-        env:
-          SKIP_ENV_FILE: true
-          PORT: ${{ secrets.PORT }}
-          MONGODB_PASSWORD: ${{ secrets.MONGODB_PASSWORD }}
-          ENDPOINT_ADMIN_ACCESS_PASSWORD: ${{ secrets.ENDPOINT_ADMIN_ACCESS_PASSWORD }}
-          MONGODB_URI: ${{ secrets.MONGODB_URI }}
-          JWT_SECRET: ${{ secrets.JWT_SECRET }}
-        run: npm test
+        run: npm test   # ← no need to repeat env here
 
   auto-merge:
     needs: test
     runs-on: ubuntu-latest
-    if: success()
+    # Only run on push to dev, NOT on every PR to dev
+    if: success() && github.event_name == 'push'
 
     steps:
       - name: Checkout repository
