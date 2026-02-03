@@ -1,0 +1,63 @@
+name: CI - Test and Auto Merge
+
+on:
+  push:
+    branches: [dev]
+  pull_request_target:          # ← changed
+    branches: [dev]
+
+permissions:
+  contents: write
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    # ← This environment must exist in repo settings and require reviewer approval
+    environment: test-with-secrets
+
+    env:
+      SKIP_ENV_FILE: true
+      PORT: ${{ secrets.PORT }}
+      MONGODB_PASSWORD: ${{ secrets.MONGODB_PASSWORD }}
+      ENDPOINT_ADMIN_ACCESS_PASSWORD: ${{ secrets.ENDPOINT_ADMIN_ACCESS_PASSWORD }}
+      MONGODB_URI: ${{ secrets.MONGODB_URI }}
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
+
+    steps:
+      - name: Checkout PR code (safely)
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}   # this is the PR's commit
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Debug env
+        run: env
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Jest tests
+        run: npm test
+
+  auto-merge:
+    needs: test
+    runs-on: ubuntu-latest
+    # Only run on push to dev, NOT on every PR to dev
+    if: success() && github.event_name == 'push'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Merge dev → main
+        uses: devmasx/merge-branch@v1.4.0
+        with:
+          type: now
+          from_branch: dev
+          target_branch: main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
