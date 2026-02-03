@@ -9,6 +9,14 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    
+    env:
+      SKIP_ENV_FILE: true
+      PORT: ${{ secrets.PORT }}
+      MONGODB_PASSWORD: ${{ secrets.MONGODB_PASSWORD }}
+      ENDPOINT_ADMIN_ACCESS_PASSWORD: ${{ secrets.ENDPOINT_ADMIN_ACCESS_PASSWORD }}
+      MONGODB_URI: ${{ secrets.MONGODB_URI }}
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
 
     steps:
       - name: Checkout repository
@@ -18,19 +26,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+      
+      - name: Debug env run env
+        run: env
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Debug env run env
-        env:
-          SKIP_ENV_FILE: true
-          PORT: ${{ secrets.PORT }}
-          MONGODB_PASSWORD: ${{ secrets.MONGODB_PASSWORD }}
-          ENDPOINT_ADMIN_ACCESS_PASSWORD: ${{ secrets.ENDPOINT_ADMIN_ACCESS_PASSWORD }}
-          MONGODB_URI: ${{ secrets.MONGODB_URI }}
-          JWT_SECRET: ${{ secrets.JWT_SECRET }}
-        run: env
       - name: Run Jest tests
         run: npm test
 
