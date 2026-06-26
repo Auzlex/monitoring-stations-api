@@ -17,25 +17,31 @@ jobs:
     name: Run Tests
     runs-on: ubuntu-latest
 
-    services:
-      postgres:
-        image: postgres:15-alpine
-        env:
-          POSTGRES_USER: test_user_ci
-          POSTGRES_PASSWORD: ci_test_password_123_456
-          POSTGRES_DB: monitoring_test_db
-          PGPORT: 5439
-        ports:
-          - 5439:5439
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Generate CI secrets
+        run: |
+          echo "CI_DB_PASSWORD=$(openssl rand -hex 16)" >> $GITHUB_ENV
+          echo "CI_JWT_SECRET=$(openssl rand -hex 32)" >> $GITHUB_ENV
+
+      - name: Start PostgreSQL container
+        run: |
+          docker run -d \
+            --name postgres \
+            -p 5439:5439 \
+            -e POSTGRES_USER=test_user_ci \
+            -e POSTGRES_PASSWORD=${{ env.CI_DB_PASSWORD }} \
+            -e POSTGRES_DB=monitoring_test_db \
+            -e PGPORT=5439 \
+            postgres:15-alpine
+          
+          # Wait for PostgreSQL to be ready
+          echo "Waiting for PostgreSQL to be ready..."
+          until docker exec postgres pg_isready -p 5439; do
+            sleep 1
+          done
 
       - name: Set up pnpm
         uses: pnpm/action-setup@v4
@@ -55,15 +61,15 @@ jobs:
       - name: Run database migrations
         run: pnpm exec prisma db push
         env:
-          DATABASE_URL: postgresql://test_user_ci:ci_test_password_123_456@localhost:5439/monitoring_test_db?schema=public
+          DATABASE_URL: postgresql://test_user_ci:${{ env.CI_DB_PASSWORD }}@localhost:5439/monitoring_test_db?schema=public
 
       - name: Run Tests
         run: pnpm test
         env:
-          DATABASE_URL: postgresql://test_user_ci:ci_test_password_123_456@localhost:5439/monitoring_test_db?schema=public
+          DATABASE_URL: postgresql://test_user_ci:${{ env.CI_DB_PASSWORD }}@localhost:5439/monitoring_test_db?schema=public
           ENDPOINT_ADMIN_ACCESS_EMAIL: admin_ci_test@example.com
           ENDPOINT_ADMIN_ACCESS_PASSWORD: admin_ci_test
-          JWT_SECRET: ci_test_jwt_secret_998877665544332211
+          JWT_SECRET: ${{ env.CI_JWT_SECRET }}
 
   build-and-push:
     name: Build and Push Docker Image
