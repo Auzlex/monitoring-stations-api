@@ -42,5 +42,5 @@ COPY --from=prod-deps /app/node_modules ./node_modules
 EXPOSE 7000
 ENV PORT=7000
 
-CMD ["sh", "-c", "pnpm exec prisma migrate deploy && node dist/src/server.js"]
+CMD ["sh", "-c", "pnpm exec prisma db push && node dist/src/server.js"]
 

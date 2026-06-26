@@ -10,6 +10,11 @@ const getAdminEmail = (): string => {
     return process.env.ENDPOINT_ADMIN_ACCESS_EMAIL || 'admin@example.com';
 };
 
+/**
+ * Ensures there is exactly one admin account in the database.
+ * If the environment variables for email or password change,
+ * the existing admin record is updated in-place to prevent duplicate accounts.
+ */
 export const ensureAdmin = async (): Promise<void> => {
     try {
         const adminEmail = getAdminEmail();
@@ -20,20 +25,37 @@ export const ensureAdmin = async (): Promise<void> => {
             return;
         }
 
-        const existingAdmin = await prisma.user.findUnique({ where: { email: adminEmail } });
+        // Search the database for the single admin account by role
+        const existingAdmin = await prisma.user.findFirst({
+            where: { role: 'admin' }
+        });
+
         const hashedPassword = await bcrypt.hash(adminPassword, 10);
 
         if (!existingAdmin) {
-            await prisma.user.create({ data: { email: adminEmail, password: hashedPassword } });
+            // No admin account exists at all, create it
+            await prisma.user.create({
+                data: {
+                    email: adminEmail,
+                    password: hashedPassword,
+                    role: 'admin'
+                }
+            });
             console.log('Admin user created.');
         } else {
+            // An admin account exists. Check if credentials have changed
+            const emailChanged = existingAdmin.email !== adminEmail;
             const passwordMatches = await bcrypt.compare(adminPassword, existingAdmin.password);
-            if (!passwordMatches) {
+
+            if (emailChanged || !passwordMatches) {
                 await prisma.user.update({
-                    where: { email: adminEmail },
-                    data: { password: hashedPassword }
+                    where: { id: existingAdmin.id },
+                    data: {
+                        email: adminEmail,
+                        password: hashedPassword
+                    }
                 });
-                console.log('Admin password updated.');
+                console.log('Admin credentials synchronized in the database.');
             }
         }
     } catch (err) {
@@ -67,9 +89,9 @@ router.post('/login', async (req: Request, res: Response) => {
             return res.status(401).json({ message: 'Invalid credentials' });
         }
 
-        const adminEmail = getAdminEmail();
+        // Generate token using the role stored in the database
         const token = jwt.sign(
-            { id: user.id, email: user.email, role: user.email === adminEmail ? 'admin' : 'user' },
+            { id: user.id, email: user.email, role: user.role },
             secret,
             { expiresIn: '1h' }
         );
