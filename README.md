@@ -10,6 +10,7 @@ All code is committed to the dev branch and automated tests with github workflow
 
 ## Table of Contents
 
+- [Prerequisites](#prerequisites)
 - [Installation](#installation)
 - [Usage](#usage)
 - [Endpoints](#endpoints)
@@ -20,6 +21,13 @@ All code is committed to the dev branch and automated tests with github workflow
 - [Work in Progress](#work-in-progress)
 <!-- - [Contributing](#contributing) -->
 <!-- - [License](#license) -->
+
+## Prerequisites
+
+Ensure you have the following installed on your host system:
+* **Node.js**: Version `20.0.0` or higher
+* **pnpm**: Version `11.0.0` or higher
+* **Docker Desktop** (or Docker Engine with Compose): Needed to spin up PostgreSQL service containers for testing and local development.
 
 ## Installation
 
