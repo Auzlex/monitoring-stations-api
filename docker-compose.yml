@@ -1,0 +1,41 @@
+services:
+  db:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USER:-auzlex}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-p@ss_auzlex_99}
+      POSTGRES_DB: ${DB_NAME:-monitoring_db}
+      PGPORT: ${DB_PORT:-5435}
+    ports:
+      - "127.0.0.1:${DB_PORT:-5435}:${DB_PORT:-5435}"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - monitoring_network
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: on-failure
+    ports:
+      - "127.0.0.1:${PORT:-7000}:${PORT:-7000}"
+    environment:
+      DATABASE_URL: "postgresql://${DB_USER:-auzlex}:${DB_PASSWORD:-p@ss_auzlex_99}@db:${DB_PORT:-5435}/${DB_NAME:-monitoring_db}?schema=public"
+      ENDPOINT_ADMIN_ACCESS_PASSWORD: ${ENDPOINT_ADMIN_ACCESS_PASSWORD:-admin}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET must be set in your .env file}
+      NODE_ENV: ${NODE_ENV:-production}
+      CORS_ORIGIN: ${CORS_ORIGIN:-*}
+      PORT: ${PORT:-7000}
+    depends_on:
+      - db
+    networks:
+      - monitoring_network
+
+volumes:
+  pgdata:
+
+networks:
+  monitoring_network:
+    name: monitoring_network

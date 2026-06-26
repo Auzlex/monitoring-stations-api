@@ -1,27 +1,29 @@
-const fs = require('fs');
-const path = require('path');
-const dotenv = require('dotenv');
+import fs from 'fs';
+import path from 'path';
+import dotenv from 'dotenv';
 
-function loadEnv() {
-
+function loadEnv(): void {
     // Skip reading .env if instructed (e.g., in GitHub Actions) 
     if (process.env.SKIP_ENV_FILE === 'true') { return; }
 
-    const envPath = path.resolve(__dirname, '.env');
+    const envPath = path.resolve(process.cwd(), '.env');
+    if (!fs.existsSync(envPath)) {
+        return;
+    }
     const envConfig = dotenv.parse(fs.readFileSync(envPath));
 
     for (const k in envConfig) {
-        if (envConfig.hasOwnProperty(k)) {
+        if (Object.prototype.hasOwnProperty.call(envConfig, k)) {
             process.env[k] = resolveEnvValue(envConfig[k], envConfig);
         }
     }
 }
 
-function resolveEnvValue(value, envConfig) {
+function resolveEnvValue(value: string, envConfig: Record<string, string>): string {
     const variableReferenceRegex = /\${(\w+)}/g;
     return value.replace(variableReferenceRegex, (_, varName) => {
         return envConfig[varName] || process.env[varName] || '';
     });
 }
 
-module.exports = loadEnv;
+export default loadEnv;

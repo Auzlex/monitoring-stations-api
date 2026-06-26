@@ -1,0 +1,15 @@
+packages:
+  - "."
+
+# PNPM 11 Security Policies
+# Enforce a 24-hour waiting period (1440 minutes) for newly published packages
+minimumReleaseAge: 1440
+
+# Prevent installation of exotic subdependencies (git, file, link)
+blockExoticSubdeps: true
+
+# Explicitly allow build scripts for Prisma
+allowBuilds:
+  "@prisma/engines": true
+  "prisma": true
+  "@prisma/client": true

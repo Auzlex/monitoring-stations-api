@@ -1,7 +1,7 @@
 # Node.js REST API for Monitoring Stations
 
 This project is a Node.js REST API for managing monitoring stations and their pollution records. The API allows users to perform CRUD operations on monitoring stations and their records. This is a work in progress, and some features are still under development and is a Node.js development exercise to improve my understanding and skills.
-This REST API will communicate to MongoDB Atlas to a target cluster.
+This REST API communicates with a PostgreSQL database via Prisma ORM.
 
 ## Note
 
@@ -31,25 +31,41 @@ All code is committed to the dev branch and automated tests with github workflow
 
 2. Install dependencies:
    ```sh
-   npm install
-    ```
+   pnpm install
+   ```
 
 3. Set up environment variables:
-   Create a `.env` file in the root directory and add the following:
-   
-   **NOTE**: I have implemented an env variable pre-processor to process variable references in the .env
+   Create a `.env` file in the root directory using `.env.example` as a template:
    ```env
-    PORT=7000
-    MONGODB_PASSWORD=<password>
-    ENDPOINT_ADMIN_ACCESS_PASSWORD=admin
-    JWT_SECRET=SECRET
-    MONGODB_URI=mongodb+srv://<username>:${MONGODB_PASSWORD}@<cluster>
+   PORT=7000
+   ENDPOINT_ADMIN_ACCESS_PASSWORD=admin
+   JWT_SECRET=your_jwt_secret_here
+   
+   DB_USER=auzlex
+   DB_PASSWORD=your_db_password_here
+   DB_NAME=monitoring_db
+   DB_PORT=5435
+   
+   DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@localhost:${DB_PORT}/${DB_NAME}?schema=public
    ```
 
-4. Start the server:
-   ```sh
-   npm start
-   ```
+4. Run locally:
+   * Generate Prisma Client:
+     ```sh
+     pnpm run prisma:generate
+     ```
+   * Spin up database container:
+     ```sh
+     docker compose up -d db
+     ```
+   * Push DB migrations:
+     ```sh
+     pnpm run prisma:push
+     ```
+   * Run API:
+     ```sh
+     pnpm run dev
+     ```
 
 ## Usage
 
@@ -181,12 +197,12 @@ The API provides endpoints to manage monitoring stations and their pollution rec
 ### Advanced Queries
 
 - **GET /stations/nearest?lat={lat}&lng={lng}&radius={km}**
-  - Description: Retrieve a list of monitoring stations within a certain radius of a given location. This endpoint should be publicly accessible.
-  - Status: Not Implemented
+  - Description: Retrieve a list of monitoring stations within a certain radius of a given location (calculates Haversine distance). This endpoint is publicly accessible.
+  - Status: Implemented
 
 - **GET /stations/:stationID/summary**
-  - Description: Retrieve a summary of pollution records for a specific monitoring station. This endpoint should be publicly accessible.
-  - Status: Not Implemented
+  - Description: Retrieve a summary (average, minimum, maximum, and count metrics per pollutant) of pollution records for a specific monitoring station. This endpoint is publicly accessible.
+  - Status: Implemented
 
 ## Unit Testing
 
@@ -280,53 +296,68 @@ Unit tests have been implemented to ensure the input and output of the endpoints
 #### Example output
 
 ```sh
- PASS  test/station.test.js
+PASS test/station.test.ts (6.333 s)
   Stations
     GET /stations
-      √ should GET all the stations (552 ms)
-      √ should GET a station by the given id (134 ms)
-      √ should not POST a station without name field (43 ms)
-      √ should not POST a station without latitude field (33 ms)
-      √ should not POST a station without longitude field (34 ms)
-      √ should POST a station (65 ms)
+      √ should GET all the stations (2113 ms)
+      √ should GET a station by the given id (32 ms)
+      √ should return 404 for a non-existent station id (15 ms)
+    POST /stations
+      √ should not POST a station without name field (32 ms)
+      √ should not POST a station without latitude field (12 ms)
+      √ should not POST a station without longitude field (12 ms)
+      √ should not POST a station with non-numeric latitude (19 ms)
+      √ should not POST a station with non-numeric longitude (22 ms)
+      √ should POST a station (25 ms)
     PATCH /stations/:stationID
-      √ should not PATCH a station with invalid name format (94 ms)
-      √ should return 404 when PATCHing a non-existent station (96 ms)
+      √ should PATCH a station name successfully (27 ms)
+      √ should not PATCH a station with invalid name format (26 ms)
+      √ should return 404 when PATCHing a non-existent station (23 ms)
     DELETE /stations/:stationID
-      √ should DELETE only the target station (184 ms)
-      √ should return 404 when deleting a non-existent station (181 ms)
+      √ should DELETE only the target station (35 ms)
+      √ should return 404 when deleting a non-existent station (26 ms)
     GET /records
-      √ should GET all records from all stations (155 ms)
-      √ should filter records by timestamp range (152 ms)
-      √ should filter records by pollutant type (152 ms)
-      √ should limit the number of records returned (161 ms)
-      √ should combine multiple filters (154 ms)
-      √ should return 400 for invalid timestamp format (118 ms)
-      √ should return 400 for invalid timestamp range (120 ms)
-      √ should return 400 for invalid limit (123 ms)
-      √ should return 400 for invalid pollutant type (119 ms)
-      √ should handle empty records (193 ms)
+      √ should GET all records from all stations (34 ms)
+      √ should filter records by timestamp range (31 ms)
+      √ should filter records by pollutant type (32 ms)
+      √ should limit the number of records returned (32 ms)
+      √ should combine multiple filters (30 ms)
+      √ should return 400 for invalid timestamp format (32 ms)
+      √ should return 400 for invalid timestamp range (28 ms)
+      √ should return 400 for invalid limit (27 ms)
+      √ should return 400 for invalid pollutant type (28 ms)
+      √ should handle empty records (36 ms)
+    GET /stations/nearest
+      √ should GET stations within a specified radius (31 ms)
+      √ should return 400 for missing query parameters (13 ms)
+    GET /stations/:stationID/summary
+      √ should GET a summary of pollution records for a station (22 ms)
+      √ should return 404 for a non-existent station (20 ms)
 
 Test Suites: 1 passed, 1 total
-Tests:       24 passed, 24 total
+Tests:       28 passed, 28 total
 Snapshots:   0 total
-Time:        4.367 s, estimated 5 s
+Time:        7.091 s
 Ran all test suites.
 ```
 
 ### Running the Tests
 
-To run the tests, use the following command:
+To run the unit tests locally (which dynamically spins up a containerized database, applies migrations, runs Jest, and downs the database):
 ```sh
-npm test
+pnpm run test:docker
 ```
+
+## Docker Container Deployment
+
+To build and launch the API server and database services via docker:
+```sh
+docker compose up --build
+```
+This maps the application port to `127.0.0.1:7000` and database port to `127.0.0.1:5435` so they are secure and cannot be accessed via the open web.
 
 ## Work in Progress / Next Steps
 
-- Implementing more unit tests
-- Implementing the `GET /stations/records` endpoint to retrieve pollution records for all monitoring stations.
-- Implementing advanced query endpoints for retrieving stations within a certain radius and summarizing pollution records.
-- Need to implement a CI/CD pipeline for this with docker, so that I can deploy future projects easily on my website.
 - Front End UI that uses this API
 
 <!-- ## Contributing

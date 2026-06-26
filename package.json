@@ -2,37 +2,52 @@
   "name": "restapie",
   "version": "1.0.0",
   "description": "A Node.js RESTful API Exercise project",
-  "main": "index.js",
+  "packageManager": "pnpm@11.0.0",
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=11.0.0"
+  },
   "scripts": {
-    "test": "jest --detectOpenHandles",
-    "start": "nodemon server.js"
+    "build": "tsc",
+    "start": "pnpm run build && node dist/src/server.js",
+    "dev": "nodemon --watch src --ext ts --exec ts-node src/server.ts",
+    "prisma:generate": "prisma generate",
+    "prisma:push": "prisma db push",
+    "test": "jest --detectOpenHandles --runInBand",
+    "test:docker": "docker compose up -d db && pnpm prisma:push && jest --detectOpenHandles --runInBand && docker compose down db"
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/Auzlex/Restapie.git"
+    "url": "git+ssh://git@github.com/Auzlex/monitoring-stations-api.git"
   },
   "author": "Auzlex",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Auzlex/Restapie/issues"
+    "url": "https://github.com/Auzlex/monitoring-stations-api/issues"
   },
-  "homepage": "https://github.com/Auzlex/Restapie#readme",
+  "homepage": "https://github.com/Auzlex/monitoring-stations-api#readme",
   "dependencies": {
+    "@prisma/client": "^5.22.0",
     "bcryptjs": "^3.0.3",
     "dotenv": "^16.6.1",
     "express": "^4.22.1",
     "jsonwebtoken": "^9.0.3",
-    "mongoose": "^8.22.0"
+    "morgan": "^1.10.1"
   },
   "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/express": "^4.17.21",
+    "@types/jest": "^29.5.11",
+    "@types/jsonwebtoken": "^9.0.5",
+    "@types/morgan": "^1.9.9",
+    "@types/node": "^20.11.20",
+    "@types/supertest": "^6.0.2",
     "jest": "^29.7.0",
-    "morgan": "^1.10.1",
     "nodemon": "^3.1.11",
-    "supertest": "^7.2.2"
-  },
-  "overrides": {
-    "js-yaml": "3.14.2",
-    "jws": "3.2.3",
-    "qs": "6.14.1"
+    "prisma": "^5.22.0",
+    "supertest": "^7.2.2",
+    "ts-jest": "^29.1.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
   }
 }

@@ -1,0 +1,36 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id       String @id @default(uuid())
+  email    String @unique
+  password String
+}
+
+model Station {
+  id        String   @id @default(uuid())
+  name      String
+  latitude  Float
+  longitude Float
+  records   Record[]
+}
+
+model Record {
+  id        String  @id @default(uuid())
+  ts        Int
+  nox       Float
+  no2       Float
+  no        Float
+  pm10      Float?
+  co        Float?
+  o3        Float?
+  so2       Float?
+  stationId String
+  station   Station @relation(fields: [stationId], references: [id], onDelete: Cascade)
+}
