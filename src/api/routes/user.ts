@@ -5,9 +5,14 @@ import { prisma } from '../../db';
 
 const router = express.Router();
 
+// Fetch admin email from environment variables (fallback to default)
+const getAdminEmail = (): string => {
+    return process.env.ENDPOINT_ADMIN_ACCESS_EMAIL || 'admin@example.com';
+};
+
 export const ensureAdmin = async (): Promise<void> => {
     try {
-        const adminEmail = 'admin@example.com';
+        const adminEmail = getAdminEmail();
         const adminPassword = process.env.ENDPOINT_ADMIN_ACCESS_PASSWORD;
 
         if (!adminPassword) {
@@ -62,8 +67,9 @@ router.post('/login', async (req: Request, res: Response) => {
             return res.status(401).json({ message: 'Invalid credentials' });
         }
 
+        const adminEmail = getAdminEmail();
         const token = jwt.sign(
-            { id: user.id, email: user.email, role: user.email === 'admin@example.com' ? 'admin' : 'user' },
+            { id: user.id, email: user.email, role: user.email === adminEmail ? 'admin' : 'user' },
             secret,
             { expiresIn: '1h' }
         );

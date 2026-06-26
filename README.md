@@ -46,6 +46,7 @@ Ensure you have the following installed on your host system:
    Create a `.env` file in the root directory using `.env.example` as a template:
    ```env
    PORT=7000
+   ENDPOINT_ADMIN_ACCESS_EMAIL=admin@example.com
    ENDPOINT_ADMIN_ACCESS_PASSWORD=admin
    JWT_SECRET=your_jwt_secret_here
    
@@ -192,7 +193,7 @@ The API provides endpoints to manage monitoring stations and their pollution rec
       }
       ```
   - Notes: 
-    - Admin role is assigned if the email is `admin@example.com`. Simple password auth to grab a token for restricted endpoints if password is known.
+    - Admin role is assigned if the email matches `ENDPOINT_ADMIN_ACCESS_EMAIL` (which defaults to `admin@example.com` if not explicitly set). Simple password auth to grab a token for restricted endpoints if password is known.
     - JWT token expires in 1 hour.
 
 ### Advanced Queries

@@ -23,6 +23,7 @@ services:
       - "127.0.0.1:${PORT:-7000}:${PORT:-7000}"
     environment:
       DATABASE_URL: "postgresql://${DB_USER:-auzlex}:${DB_PASSWORD:-p@ss_auzlex_99}@db:${DB_PORT:-5435}/${DB_NAME:-monitoring_db}?schema=public"
+      ENDPOINT_ADMIN_ACCESS_EMAIL: ${ENDPOINT_ADMIN_ACCESS_EMAIL:-admin@example.com}
       ENDPOINT_ADMIN_ACCESS_PASSWORD: ${ENDPOINT_ADMIN_ACCESS_PASSWORD:-admin}
       JWT_SECRET: ${JWT_SECRET:?JWT_SECRET must be set in your .env file}
       NODE_ENV: ${NODE_ENV:-production}

@@ -61,6 +61,7 @@ jobs:
         run: pnpm test
         env:
           DATABASE_URL: postgresql://test_user_ci:ci_test_password_123_456@localhost:5439/monitoring_test_db?schema=public
+          ENDPOINT_ADMIN_ACCESS_EMAIL: admin_ci_test@example.com
           ENDPOINT_ADMIN_ACCESS_PASSWORD: admin_ci_test
           JWT_SECRET: ci_test_jwt_secret_998877665544332211
 
