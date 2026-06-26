@@ -13,3 +13,7 @@ allowBuilds:
   "@prisma/engines": true
   "prisma": true
   "@prisma/client": true
+
+# Package overrides
+overrides:
+  js-yaml: "^4.1.3"
