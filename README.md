@@ -50,22 +50,15 @@ All code is committed to the dev branch and automated tests with github workflow
    ```
 
 4. Run locally:
-   * Generate Prisma Client:
-     ```sh
-     pnpm run prisma:generate
-     ```
-   * Spin up database container:
-     ```sh
-     docker compose up -d db
-     ```
-   * Push DB migrations:
-     ```sh
-     pnpm run prisma:push
-     ```
-   * Run API:
+   * Simply start the integrated development orchestrator:
      ```sh
      pnpm run dev
      ```
+     This custom script will:
+     1. Spin up the PostgreSQL Docker container in the background.
+     2. Ensure database schemas are synchronized with Prisma.
+     3. Start the Express development server with live-reloading (`nodemon`).
+     4. **Auto-clean**: Automatically stop and remove the PostgreSQL container when you exit/stop the command (`Ctrl+C`).
 
 ## Usage
 
@@ -348,13 +341,39 @@ To run the unit tests locally (which dynamically spins up a containerized databa
 pnpm run test:docker
 ```
 
-## Docker Container Deployment
+## Docker Container Deployment & Security Architecture
 
-To build and launch the API server and database services via docker:
+To build and launch the API server and database services via Docker:
 ```sh
 docker compose up --build
 ```
-This maps the application port to `127.0.0.1:7000` and database port to `127.0.0.1:5435` so they are secure and cannot be accessed via the open web.
+
+### Security & Architecture Design Choices
+
+#### 1. Loopback Binding (`127.0.0.1`)
+In `docker-compose.yml`, all exposed ports are explicitly bound to the loopback interface (`127.0.0.1`):
+* API: `127.0.0.1:7000:7000`
+* PostgreSQL: `127.0.0.1:5435:5435`
+
+**Why?** By default, Docker exposes ports on `0.0.0.0` (all interfaces), which opens the ports to the public internet if the host machine has a public IP. Binding to `127.0.0.1` locks down the network interface so the database and API are only accessible locally on the host machine or via a reverse proxy (e.g. Nginx).
+
+#### 2. Non-Standard Port Mapping
+PostgreSQL is configured to run internally and externally on port `5435` instead of the default `5432`.
+**Why?** This prevents port conflicts with any existing default PostgreSQL instances running natively on the host system, and adds a minor layer of security obscurity.
+
+#### 3. Inter-Container Integration (Connecting other projects)
+If you want another project or container to interact with this PostgreSQL instance:
+* **From the host system**: Connect using `postgresql://auzlex:<password>@localhost:5435/monitoring_db`.
+* **From another Docker container**: Link the container to the same network (`monitoring_network`) and connect directly using `postgresql://auzlex:<password>@db:5435/monitoring_db` (using the container hostname `db` and port `5435`).
+
+#### 4. Multi-Stage Build Optimization
+The [Dockerfile](file:///c:/Users/charl/Documents/boring-projects/monitoring-stations-api/Dockerfile) is designed using multiple stages:
+* `deps`: Installs both dependencies and devDependencies to compile and run checks.
+* `prod-deps`: Installs only production dependencies (`pnpm install --prod`).
+* `runner`: Contains only the compiled output (`dist`) and production `node_modules` from `prod-deps`.
+
+**Why?** This keeps the final production Docker image extremely lightweight (removing compilers, Jest, TypeScript, and test packages) and limits the container attack surface by excluding unnecessary packages.
+
 
 ## Work in Progress / Next Steps
 
