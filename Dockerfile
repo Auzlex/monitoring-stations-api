@@ -4,7 +4,7 @@ FROM node:22-alpine AS base
 # Enable pnpm
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
-RUN corepack enable
+RUN apk add --no-cache openssl libc6-compat && corepack enable
 
 # Install all dependencies (development + production) for building & generating client
 FROM base AS deps
